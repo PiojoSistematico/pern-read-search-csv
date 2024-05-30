@@ -1,5 +1,8 @@
-import React from "react";
 import { useForm } from "react-hook-form";
+
+type FormData = {
+  file: FileList;
+};
 
 const Form = () => {
   const {
@@ -7,17 +10,30 @@ const Form = () => {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm<FormData>();
 
-  function onSubmit(data) {
-    console.log(data);
+  async function onSubmit(data: FormData) {
+    const formData = new FormData();
+    formData.append("file", data);
+    try {
+      const res = await fetch("//localhost:3000/api/files", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        throw new Error(`Error Uploading the file: ${res.statusText}`);
+      }
+    } catch (error) {}
     reset();
   }
 
   return (
     <form action="" onSubmit={handleSubmit(onSubmit)}>
       <input {...register("file")} type="file" accept=".csv" name="file" />
-      <button>Upload</button>
+      <button disabled={isSubmitting}>
+        {isSubmitting ? "Uploading" : "Upload"}
+      </button>
+      {errors.file && <p>Some errors</p>}
     </form>
   );
 };
