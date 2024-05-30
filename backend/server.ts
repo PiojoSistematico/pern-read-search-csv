@@ -16,8 +16,7 @@ app.use(cors());
 
 let jsonData: Array<Record<string, string>> = [];
 
-app.post("api/files", upload.single("file"), async (req, res) => {
-  console.log("posting");
+app.post("/api/files", upload.single("file"), async (req, res) => {
   const { file } = req;
   /* Handle upload failed */
   if (!file) {
@@ -25,7 +24,8 @@ app.post("api/files", upload.single("file"), async (req, res) => {
   }
 
   /* Check mimetype */
-  if (file.mimetype != "text/csv") {
+  const validMimeTypes = ["text/csv", "application/vnd.ms-excel"];
+  if (!validMimeTypes.includes(file.mimetype)) {
     return res.status(500).json({ message: "File must be CSV" });
   }
 
@@ -40,10 +40,12 @@ app.post("api/files", upload.single("file"), async (req, res) => {
   }
 
   /* All good */
-  return res.status(200).json({ message: "File uploaded successfully" });
+  return res
+    .status(200)
+    .json({ message: "File uploaded successfully", data: jsonData });
 });
 
-app.get("api/users", async (req, res) => {
+app.get("/api/users", async (req, res) => {
   console.log("getting");
   const { q } = req.query;
   if (!q) {

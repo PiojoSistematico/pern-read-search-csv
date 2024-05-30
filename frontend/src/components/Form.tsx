@@ -4,6 +4,11 @@ type FormData = {
   file: FileList;
 };
 
+type UploadResponse = {
+  message: string;
+  data: FileList;
+};
+
 const Form = () => {
   const {
     register,
@@ -14,16 +19,25 @@ const Form = () => {
 
   async function onSubmit(data: FormData) {
     const formData = new FormData();
-    formData.append("file", data);
+    if (data.file && data.file.length > 0) {
+      formData.append("file", data.file[0]);
+    }
     try {
-      const res = await fetch("//localhost:3000/api/files", {
+      const res = await fetch("http://localhost:3000/api/files", {
         method: "POST",
         body: formData,
       });
       if (!res.ok) {
         throw new Error(`Error Uploading the file: ${res.statusText}`);
       }
-    } catch (error) {}
+
+      console.log(res);
+      const json: UploadResponse = await res.json();
+      console.log(json.data);
+      return json.data;
+    } catch (error) {
+      if (error instanceof Error) return error;
+    }
     reset();
   }
 
