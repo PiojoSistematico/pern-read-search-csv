@@ -1,4 +1,6 @@
 import { useForm } from "react-hook-form";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/use-toast";
 
 type FormData = {
   file: FileList;
@@ -6,10 +8,14 @@ type FormData = {
 
 type UploadResponse = {
   message: string;
-  data: FileList;
+  data?: FileList;
 };
 
-const Form = () => {
+type formProps = {
+  setData: React.Dispatch<React.SetStateAction<any>>;
+};
+
+const Form: React.FunctionComponent<formProps> = ({ setData }) => {
   const {
     register,
     handleSubmit,
@@ -27,14 +33,13 @@ const Form = () => {
         method: "POST",
         body: formData,
       });
+      const json: UploadResponse = await res.json();
       if (!res.ok) {
+        toast({ variant: "destructive", description: json.message });
         throw new Error(`Error Uploading the file: ${res.statusText}`);
       }
-
-      console.log(res);
-      const json: UploadResponse = await res.json();
-      console.log(json.data);
-      return json.data;
+      toast({ variant: "default", description: json.message });
+      setData(json.data);
     } catch (error) {
       if (error instanceof Error) return error;
     }
@@ -42,13 +47,16 @@ const Form = () => {
   }
 
   return (
-    <form action="" onSubmit={handleSubmit(onSubmit)}>
-      <input {...register("file")} type="file" accept=".csv" name="file" />
-      <button disabled={isSubmitting}>
-        {isSubmitting ? "Uploading" : "Upload"}
-      </button>
-      {errors.file && <p>Some errors</p>}
-    </form>
+    <>
+      <form action="" onSubmit={handleSubmit(onSubmit)}>
+        <input {...register("file")} type="file" accept=".csv" name="file" />
+        <button disabled={isSubmitting}>
+          {isSubmitting ? "Uploading" : "Upload"}
+        </button>
+        {errors.file && <p>Some errors</p>}
+      </form>
+      <Toaster />
+    </>
   );
 };
 
