@@ -49,7 +49,7 @@ app.get("/api/users", async (req, res) => {
   console.log("getting");
   const { q } = req.query;
   if (!q) {
-    return res.status(500).json({ message: "Query param is missing" });
+    return res.status(200).json({ data: jsonData });
   }
 
   const searchWord = q.toString().toLowerCase();

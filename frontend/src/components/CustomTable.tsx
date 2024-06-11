@@ -21,7 +21,7 @@ const CustomTable: React.FunctionComponent<CustomTableProps> = ({ data }) => {
 
   return (
     <Table>
-      <TableCaption>Yur CSV data</TableCaption>
+      <TableCaption>Your CSV data</TableCaption>
       <TableHeader>
         <TableRow>
           {columnNames.map((columnName, index) => (
